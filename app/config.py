@@ -12,3 +12,4 @@ ANTHROPIC_API_KEY = get("ANTHROPIC_API_KEY")
 SMTP_ENABLED = get("SMTP_ENABLED", "false").lower() == "true"
 CRM_MODE = get("CRM_MODE", "rule")
 "config"
+DEBUG = get("DEBUG","false").lower()=="true"

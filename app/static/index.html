@@ -1,8 +1,9 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><title>CRM</title></head><body>
 <h1>CRM Dashboard</h1>
+<button onclick="simulate()">Simulate order</button>
 <section><h2>Orders</h2>
-<select id="status"><option value="">all</option><option>pending</option><option>processing</option><option>completed</option><option>shipped</option></select>
+<select id="status" onchange="load()"><option value="">all</option><option>pending</option><option>processing</option><option>completed</option><option>shipped</option></select>
 <button onclick="load()">Refresh</button>
 <table border=1 id="orders"></table></section>
 <section><h2>Customers</h2><table border=1 id="customers"></table></section>
@@ -14,8 +15,14 @@ async function load(){
   const s=document.getElementById('status').value;
   const orders=await j('/orders'+(s?'?status='+s:''));
   const t=document.getElementById('orders');t.innerHTML='';orders.forEach(o=>row(t,[o.woo_id,o.status,o.total,o.currency]));
-  const cust=await j('/customers');const c=document.getElementById('customers');c.innerHTML='';cust.forEach(x=>row(c,[x.woo_id,x.name,x.email,x.orders_count,x.total_spent]));
-  const msg=await j('/messages');const m=document.getElementById('messages');m.innerHTML='';msg.forEach(x=>row(m,[x.id,x.to_email,x.subject,x.status]));
+  const cust=await j('/customers');const c=document.getElementById('customers');c.innerHTML='';cust.forEach(x=>row(c,[x.woo_id,x.name,x.email]));
+  const msg=await j('/messages');const m=document.getElementById('messages');m.innerHTML='';
+  msg.forEach(x=>{const tr=document.createElement('tr');
+    [x.id,x.to_email,x.subject,x.status,x.source].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td);});
+    const td=document.createElement('td');const b=document.createElement('button');b.textContent='reasoning';b.onclick=()=>alert(x.trace);td.appendChild(b);tr.appendChild(td);
+    m.appendChild(tr);});
 }
+async function simulate(){await fetch('/dev/simulate',{method:'POST'});load();}
+setInterval(load,5000);
 load();
 </script></body></html>
