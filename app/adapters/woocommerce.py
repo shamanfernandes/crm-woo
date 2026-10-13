@@ -23,6 +23,20 @@ class MockWooClient:
     def list_customers(self): return []
     def list_orders(self, status=None): return []
 
+class RealWooClient(MockWooClient):
+    def __init__(self):
+        try:
+            from woocommerce import API
+        except Exception:
+            raise RuntimeError("woocommerce package not installed")
+        import os
+        self.api = API(url=os.getenv("WC_BASE_URL"), consumer_key=os.getenv("WC_CONSUMER_KEY"), consumer_secret=os.getenv("WC_CONSUMER_SECRET"), version="wc/v3")
+    def list_customers(self):
+        return self.api.get("customers").json()
+    def list_orders(self, status=None):
+        params={"status": status} if status else {}
+        return self.api.get("orders", params=params).json()
+
 class WooClient(MockWooClient):
     def __init__(self, base_url="", key="", secret=""):
         self.base_url = base_url.rstrip("/")
@@ -36,7 +50,14 @@ class WooClient(MockWooClient):
         r.raise_for_status(); return r.json()
 
 def woo_client():
-    url = os.getenv("WOO_URL") if False else __import__("os").getenv("WOO_URL","")
-    if not url: return MockWooClient()
-    return WooClient(url, __import__("os").getenv("WOO_KEY",""), __import__("os").getenv("WOO_SECRET",""))
+    import os
+    if os.getenv("WC_BASE_URL") and os.getenv("WC_CONSUMER_KEY") and os.getenv("WC_CONSUMER_SECRET"):
+        try:
+            return RealWooClient()
+        except Exception:
+            return MockWooClient()
+    url = os.getenv("WOO_URL","")
+    if url:
+        return WooClient(url, os.getenv("WOO_KEY",""), os.getenv("WOO_SECRET",""))
+    return MockWooClient()
 "adapter"

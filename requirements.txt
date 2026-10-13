@@ -6,3 +6,4 @@ anthropic>=0.30
 pytest>=8.0
 httpx>=0.25
 pytest-cov>=4.0
+woocommerce>=3.0.0
