@@ -1,28 +1,94 @@
-<!doctype html>
-<html><head><meta charset="utf-8"><title>CRM</title></head><body>
-<h1>CRM Dashboard</h1>
-<button onclick="simulate()">Simulate order</button>
-<section><h2>Orders</h2>
-<select id="status" onchange="load()"><option value="">all</option><option>pending</option><option>processing</option><option>completed</option><option>shipped</option></select>
-<button onclick="load()">Refresh</button>
-<table border=1 id="orders"></table></section>
-<section><h2>Customers</h2><table border=1 id="customers"></table></section>
-<section><h2>Messages</h2><table border=1 id="messages"></table></section>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CRM for WooCommerce</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--accent:#4f46e5;--shadow:0 4px 12px rgba(0,0,0,.06);--radius:12px;--gap:8px}
+@media (prefers-color-scheme:dark){:root{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--accent:#818cf8;--shadow:0 4px 12px rgba(0,0,0,.4)}}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:1200px;margin:0 auto;padding:calc(var(--gap)*3)} 
+.top{display:flex;justify-content:space-between;align-items:center;gap:var(--gap);flex-wrap:wrap;margin-bottom:calc(var(--gap)*3)}
+.brand{font-size:20px;font-weight:700}
+.pill{padding:6px 12px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-size:12px}
+.btn{background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600}
+.btn:hover{opacity:.92}.btn:focus{outline:2px solid var(--accent);outline-offset:2px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--gap)*2);margin-bottom:calc(var(--gap)*3)}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:calc(var(--gap)*2)}
+.stat .n{font-size:28px;font-weight:700}.stat .l{color:var(--muted);font-size:12px}
+.main{display:grid;grid-template-columns:1.4fr 1fr;gap:calc(var(--gap)*3);margin-bottom:calc(var(--gap)*3)}
+@media (max-width:760px){.main{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:var(--gap)}
+.chip{padding:4px 10px;border-radius:999px;border:1px solid #cbd5e1;background:transparent;cursor:pointer;font-size:12px}
+.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.table{width:100%;border-collapse:collapse} .table th,.table td{padding:10px;text-align:left;border-bottom:1px solid #e2e8f0}
+.table thead th{position:sticky;top:0;background:var(--card)}
+.table tbody tr:hover{background:rgba(79,70,229,.06)} .new{animation:hl 1.2s}
+@keyframes hl{0%{background:rgba(79,70,229,.25)}100%{background:transparent}}
+.badge{padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.pending{background:#fef3c7;color:#92400e}.processing{background:#dbeafe;color:#1e40af}.shipped{background:#e0e7ff;color:#3730a3}.completed{background:#dcfce7;color:#166534}.cancelled{background:#fee2e2;color:#991b1b}
+.source-llm{background:#ede9fe;color:#5b21b6}.source-rule{background:#e2e8f0;color:#475569}
+.msg{border:1px solid #e2e8f0;border-radius:10px;padding:var(--gap);margin-bottom:var(--gap)}
+.msghead{display:flex;justify-content:space-between;gap:var(--gap);flex-wrap:wrap}
+.reason{max-height:0;overflow:hidden;transition:max-height .3s; background:#0b1020;color:#e2e8f0;font-family:ui-monospace,monospace;font-size:12px;padding:0 10px;border-radius:8px;white-space:pre-wrap}
+.reason.open{max-height:300px;padding:10px;margin-top:var(--gap)}
+.empty{text-align:center;color:var(--muted);padding:calc(var(--gap)*4)}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;display:none}
+.cust{display:flex;align-items:center;gap:var(--gap);padding:var(--gap);border-bottom:1px solid #e2e8f0}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700}
+</style></head><body>
+<div class="wrap">
+<div class="top"><div class="brand">CRM for WooCommerce</div><div><span class="pill" id="conn">Connected to: Mock store</span> <button class="btn" id="simBtn" style="display:none">Simulate order</button></div></div>
+<div class="grid4">
+<div class="card stat"><div class="n" id="sCust">0</div><div class="l">Customers</div></div>
+<div class="card stat"><div class="n" id="sOrd">0</div><div class="l">Orders</div></div>
+<div class="card stat"><div class="n" id="sMsg">0</div><div class="l">Messages sent</div></div>
+<div class="card stat"><div class="n" id="sLlm">0%</div><div class="l">LLM-written share</div></div>
+</div>
+<div class="main">
+<div class="card"><h3>Orders</h3><div class="chips" id="chips"></div><div style="max-height:420px;overflow:auto"><table class="table"><thead><tr><th>ID</th><th>Status</th><th>Total</th><th>Currency</th></tr></thead><tbody id="orders"></tbody></table></div><div class="empty" id="oEmpty" style="display:none">No orders yet. Click Simulate order</div></div>
+<div class="card"><h3>Customers</h3><div id="customers"></div><div class="empty" id="cEmpty" style="display:none">No customers yet.</div></div>
+</div>
+<div class="card"><h3>Messages</h3><div id="messages"></div><div class="empty" id="mEmpty" style="display:none">No messages yet.</div></div>
+</div>
+<div class="toast" id="toast"></div>
 <script>
-async function j(u){const r=await fetch(u);return r.json();}
-function row(t,cells){const tr=document.createElement('tr');cells.forEach(c=>{const td=document.createElement('td');td.textContent=c;tr.appendChild(td);});t.appendChild(tr);}
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let filter='All'; let open=new Set(); let seenOrders=new Set(); let seenMsgs=new Set();
 async function load(){
-  const s=document.getElementById('status').value;
-  const orders=await j('/orders'+(s?'?status='+s:''));
-  const t=document.getElementById('orders');t.innerHTML='';orders.forEach(o=>row(t,[o.woo_id,o.status,o.total,o.currency]));
-  const cust=await j('/customers');const c=document.getElementById('customers');c.innerHTML='';cust.forEach(x=>row(c,[x.woo_id,x.name,x.email]));
-  const msg=await j('/messages');const m=document.getElementById('messages');m.innerHTML='';
-  msg.forEach(x=>{const tr=document.createElement('tr');
-    [x.id,x.to_email,x.subject,x.status,x.source].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td);});
-    const td=document.createElement('td');const b=document.createElement('button');b.textContent='reasoning';b.onclick=()=>alert(x.trace);td.appendChild(b);tr.appendChild(td);
-    m.appendChild(tr);});
+  const [health,custs,ords,msgs]=await Promise.all([fetch('/health').then(r=>r.json()).catch(()=>({})),fetch('/customers').then(r=>r.json()),fetch('/orders').then(r=>r.json()),fetch('/messages').then(r=>r.json())]);
+  document.getElementById('conn').textContent='Connected to: '+(health.status?'Mock store':'Unknown');
+  document.getElementById('sCust').textContent=custs.length;
+  document.getElementById('sOrd').textContent=ords.length;
+  document.getElementById('sMsg').textContent=msgs.filter(m=>m.status==='sent').length;
+  const llm=msgs.filter(m=>m.source==='llm').length; document.getElementById('sLlm').textContent=(msgs.length?Math.round(100*llm/msgs.length):0)+'%';
+  const chipDefs=['All','Pending','Processing','Shipped','Completed']; const chips=document.getElementById('chips'); chips.innerHTML=''; chipDefs.forEach(c=>{const b=document.createElement('button');b.className='chip'+(c===filter?' active':'');b.textContent=c;b.onclick=()=>{filter=c;renderOrders(ords);loadChips();};chips.appendChild(b);});
+  renderOrders(ords); renderCust(custs); renderMsgs(msgs);
 }
-async function simulate(){await fetch('/dev/simulate',{method:'POST'});load();}
-setInterval(load,5000);
-load();
+function loadChips(){}
+function renderOrders(ords){
+  const f=filter==='All'?ords:ords.filter(o=>(o.status||'').toLowerCase()===filter.toLowerCase());
+  const sorted=[...f].sort((a,b)=>b.woo_id-a.woo_id);
+  const tb=document.getElementById('orders');tb.innerHTML='';
+  sorted.forEach(o=>{const tr=document.createElement('tr'); if(!seenOrders.has(o.woo_id)){seenOrders.add(o.woo_id);tr.classList.add('new');} const st=(o.status||'').toLowerCase();
+    [o.woo_id, null, o.total, o.currency].forEach((v,i)=>{const td=document.createElement('td'); if(i===1){const span=document.createElement('span');span.className='badge '+st;span.textContent=o.status;td.appendChild(span);}else td.textContent=v;tr.appendChild(td);});tb.appendChild(tr);});
+  document.getElementById('oEmpty').style.display=sorted.length?'none':'block';
+}
+function initials(n){return (n||'').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';}
+function renderCust(custs){const el=document.getElementById('customers');el.innerHTML='';if(!custs.length){document.getElementById('cEmpty').style.display='block';return;}document.getElementById('cEmpty').style.display='none';
+  custs.forEach(c=>{const d=document.createElement('div');d.className='cust';
+    const av=document.createElement('div');av.className='avatar';av.textContent=initials(c.name);d.appendChild(av);
+    const info=document.createElement('div');info.innerHTML=`<strong>${esc(c.name||'Unnamed')}</strong><br><small>${esc(c.email||'')}</small><br><small>${esc(c.orders_count||0)} orders</small>`;d.appendChild(info);el.appendChild(d);});}
+function renderMsgs(msgs){const el=document.getElementById('messages');el.innerHTML='';if(!msgs.length){document.getElementById('mEmpty').style.display='block';return;}document.getElementById('mEmpty').style.display='none';
+  msgs.slice().reverse().forEach(m=>{const card=document.createElement('div');card.className='msg';
+    const head=document.createElement('div');head.className='msghead';
+    const left=document.createElement('div');left.innerHTML=`<strong>${esc(m.to_email)}</strong><br>${esc(m.subject)}`;head.appendChild(left);
+    const right=document.createElement('div'); 
+    const sb=document.createElement('span');sb.className='badge '+(m.status==='sent'?'completed':'pending');sb.textContent=m.status;right.appendChild(sb);
+    const src=document.createElement('span');src.className='badge '+(m.source==='llm'?'source-llm':'source-rule');src.textContent=m.source==='llm'?'LLM':'Rule-based';src.style.marginLeft='6px';right.appendChild(src);
+    const tgl=document.createElement('button');tgl.textContent='Agent reasoning';tgl.style.marginLeft='6px';tgl.onclick=()=>{const r=card.querySelector('.reason');if(open.has(m.id)){r.classList.remove('open');open.delete(m.id);}else{r.classList.add('open');open.add(m.id);}};right.appendChild(tgl);
+    head.appendChild(right);card.appendChild(head);
+    const reason=document.createElement('div');reason.className='reason'+(open.has(m.id)?' open':'');
+    try{const tr=JSON.parse(m.trace||'[]');reason.textContent=tr.map(x=>JSON.stringify(x,null,2)).join('\n---\n')||m.trace;}catch(e){reason.textContent=m.trace||'';}
+    card.appendChild(reason);el.appendChild(card);});}
+async function simulate(){const r=await fetch('/dev/simulate',{method:'POST'});if(r.ok){showToast('Order simulated, agent is writing a message...');await load();}else showToast('Simulate unavailable');}
+function showToast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';setTimeout(()=>el.style.display='none',2500);}
+async function detectSim(){try{const r=await fetch('/dev/simulate',{method:'POST'});if(r.status!==404){document.getElementById('simBtn').style.display='inline-block';document.getElementById('simBtn').onclick=simulate;}}catch(e){}} 
+detectSim(); load(); setInterval(load,5000);
 </script></body></html>
