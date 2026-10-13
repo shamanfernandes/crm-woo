@@ -1,94 +1,139 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CRM for WooCommerce</title>
 <style>
-:root{--bg:#f6f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--accent:#4f46e5;--shadow:0 4px 12px rgba(0,0,0,.06);--radius:12px;--gap:8px}
-@media (prefers-color-scheme:dark){:root{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--accent:#818cf8;--shadow:0 4px 12px rgba(0,0,0,.4)}}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-.wrap{max-width:1200px;margin:0 auto;padding:calc(var(--gap)*3)} 
-.top{display:flex;justify-content:space-between;align-items:center;gap:var(--gap);flex-wrap:wrap;margin-bottom:calc(var(--gap)*3)}
-.brand{font-size:20px;font-weight:700}
-.pill{padding:6px 12px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-size:12px}
-.btn{background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600}
-.btn:hover{opacity:.92}.btn:focus{outline:2px solid var(--accent);outline-offset:2px}
+:root{--bg:#f6f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--accent:#4f46e5;--shadow:0 4px 12px rgba(0,0,0,.06);--radius:12px;--gap:8px;--border:#e2e8f0}
+@media (prefers-color-scheme:dark){:root{--bg:#0f172a;--card:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--accent:#818cf8;--shadow:0 4px 12px rgba(0,0,0,.4);--border:#334155}}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:14px;background:var(--bg);color:var(--text)}
+.wrap{max-width:1200px;margin:0 auto;padding:calc(var(--gap)*3)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:var(--gap);flex-wrap:wrap;margin-bottom:calc(var(--gap)*3);border-bottom:1px solid var(--border);padding-bottom:calc(var(--gap)*2)}
+.brand{display:flex;align-items:center;gap:10px}.mark{width:34px;height:34px;border-radius:8px;background:var(--accent);display:grid;place-items:center}
+.subtitle{color:var(--muted);font-size:12px;margin-top:2px}
+.pill{padding:6px 12px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-size:12px;display:inline-flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 rgba(34,197,94,.7);animation:pulse 1.5s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.7)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+.btn{background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;transition:transform .05s;position:relative}
+.btn:hover{opacity:.92}.btn:active{transform:scale(.98)}.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.btn:disabled{opacity:.6;cursor:not-allowed}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:inline-block;margin-left:6px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:calc(var(--gap)*2);margin-bottom:calc(var(--gap)*3)}
 .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:calc(var(--gap)*2)}
-.stat .n{font-size:28px;font-weight:700}.stat .l{color:var(--muted);font-size:12px}
+.stat{display:flex;align-items:center;gap:12px;min-height:88px}
+.stat .icon{width:40px;height:40px;border-radius:50%;background:rgba(79,70,229,.12);display:grid;place-items:center;color:var(--accent)}
+.stat .n{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums}.stat .l{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 .main{display:grid;grid-template-columns:1.4fr 1fr;gap:calc(var(--gap)*3);margin-bottom:calc(var(--gap)*3)}
 @media (max-width:760px){.main{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:380px){.grid4{grid-template-columns:1fr}}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:var(--gap)}
-.chip{padding:4px 10px;border-radius:999px;border:1px solid #cbd5e1;background:transparent;cursor:pointer;font-size:12px}
-.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
-.table{width:100%;border-collapse:collapse} .table th,.table td{padding:10px;text-align:left;border-bottom:1px solid #e2e8f0}
-.table thead th{position:sticky;top:0;background:var(--card)}
-.table tbody tr:hover{background:rgba(79,70,229,.06)} .new{animation:hl 1.2s}
-@keyframes hl{0%{background:rgba(79,70,229,.25)}100%{background:transparent}}
-.badge{padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.chip{padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:12px;color:var(--text)}
+.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}.chip .cnt{opacity:.7;margin-left:4px}
+.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px;text-align:left;border-bottom:1px solid var(--border)}
+.table thead th{position:sticky;top:0;background:var(--card);font-size:11px;text-transform:uppercase;color:var(--muted)}
+.table tbody tr:hover{background:rgba(79,70,229,.06)}.new{animation:hl 1.2s}
+@keyframes hl{0%{background:rgba(79,70,229,.22)}100%{background:transparent}}
+.badge{padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.dotb{width:6px;height:6px;border-radius:50%}
 .pending{background:#fef3c7;color:#92400e}.processing{background:#dbeafe;color:#1e40af}.shipped{background:#e0e7ff;color:#3730a3}.completed{background:#dcfce7;color:#166534}.cancelled{background:#fee2e2;color:#991b1b}
 .source-llm{background:#ede9fe;color:#5b21b6}.source-rule{background:#e2e8f0;color:#475569}
-.msg{border:1px solid #e2e8f0;border-radius:10px;padding:var(--gap);margin-bottom:var(--gap)}
+.msg{border:1px solid var(--border);border-left:4px solid #94a3b8;border-radius:10px;padding:var(--gap);margin-bottom:var(--gap)}.msg.llm{border-left-color:#7c3aed}
 .msghead{display:flex;justify-content:space-between;gap:var(--gap);flex-wrap:wrap}
-.reason{max-height:0;overflow:hidden;transition:max-height .3s; background:#0b1020;color:#e2e8f0;font-family:ui-monospace,monospace;font-size:12px;padding:0 10px;border-radius:8px;white-space:pre-wrap}
+.preview{color:var(--muted);font-size:12px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin:4px 0}
+.reason{max-height:0;overflow:hidden;transition:max-height .3s;background:#0b1020;color:#e2e8f0;font-family:ui-monospace,monospace;font-size:12px;padding:0 10px;border-radius:8px;white-space:pre-wrap}
 .reason.open{max-height:300px;padding:10px;margin-top:var(--gap)}
+.copy{font-size:11px;padding:2px 6px;border:1px solid var(--border);background:var(--card);border-radius:6px;cursor:pointer}
 .empty{text-align:center;color:var(--muted);padding:calc(var(--gap)*4)}
 .toast{position:fixed;bottom:20px;right:20px;background:var(--accent);color:#fff;padding:10px 14px;border-radius:8px;display:none}
-.cust{display:flex;align-items:center;gap:var(--gap);padding:var(--gap);border-bottom:1px solid #e2e8f0}
-.avatar{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700}
+.cust{display:flex;align-items:center;gap:var(--gap);padding:var(--gap);border-bottom:1px solid var(--border)}
+.avatar{width:36px;height:36px;border-radius:50%;color:#fff;display:grid;place-items:center;font-weight:700}
+.pill2{padding:2px 8px;border-radius:999px;background:#e2e8f0;color:#475569;font-size:11px}
+.footer{margin-top:calc(var(--gap)*4);color:var(--muted);font-size:12px;text-align:center;border-top:1px solid var(--border);padding-top:calc(var(--gap)*2)}
+h3{margin:0 0 var(--gap);font-weight:600}
 </style></head><body>
 <div class="wrap">
-<div class="top"><div class="brand">CRM for WooCommerce</div><div><span class="pill" id="conn">Connected to: Mock store</span> <button class="btn" id="simBtn" style="display:none">Simulate order</button></div></div>
+<header class="top"><div><div class="brand"><div class="mark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg></div><div><strong>CRM for WooCommerce</strong><div class="subtitle">Customers, orders and AI-written messages in one place</div></div></div></div><div><span class="pill"><span class="dot"></span><span id="conn">Connected to: Mock store</span></span> <button class="btn" id="simBtn" style="display:none">Simulate order</button></div></header>
 <div class="grid4">
-<div class="card stat"><div class="n" id="sCust">0</div><div class="l">Customers</div></div>
-<div class="card stat"><div class="n" id="sOrd">0</div><div class="l">Orders</div></div>
-<div class="card stat"><div class="n" id="sMsg">0</div><div class="l">Messages sent</div></div>
-<div class="card stat"><div class="n" id="sLlm">0%</div><div class="l">LLM-written share</div></div>
+<div class="card stat"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div class="n" id="sCust">0</div><div class="l">Customers</div></div></div>
+<div class="card stat"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></svg></div><div><div class="n" id="sOrd">0</div><div class="l">Orders</div></div></div>
+<div class="card stat"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div><div><div class="n" id="sMsg">0</div><div class="l">Messages sent</div></div></div>
+<div class="card stat"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4 1.5 6L12 16l-6 3 1.5-6L3 9l6-1z"/></svg></div><div><div class="n" id="sLlm">0%</div><div class="l">LLM-written share</div></div></div>
 </div>
 <div class="main">
-<div class="card"><h3>Orders</h3><div class="chips" id="chips"></div><div style="max-height:420px;overflow:auto"><table class="table"><thead><tr><th>ID</th><th>Status</th><th>Total</th><th>Currency</th></tr></thead><tbody id="orders"></tbody></table></div><div class="empty" id="oEmpty" style="display:none">No orders yet. Click Simulate order</div></div>
+<div class="card"><h3>Orders</h3><div class="chips" id="chips"></div><div style="max-height:440px;overflow:auto"><table class="table"><thead><tr><th>ID</th><th>Customer</th><th>Status</th><th style="text-align:right">Total</th><th>Date</th></tr></thead><tbody id="orders"></tbody></table></div><div class="empty" id="oEmpty" style="display:none">No orders yet. Click Simulate order</div></div>
 <div class="card"><h3>Customers</h3><div id="customers"></div><div class="empty" id="cEmpty" style="display:none">No customers yet.</div></div>
 </div>
 <div class="card"><h3>Messages</h3><div id="messages"></div><div class="empty" id="mEmpty" style="display:none">No messages yet.</div></div>
+<footer class="footer">Built with FastAPI, SQLite and an LLM agent (Groq gpt-oss-120b)</footer>
 </div>
 <div class="toast" id="toast"></div>
 <script>
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let filter='All'; let open=new Set(); let seenOrders=new Set(); let seenMsgs=new Set();
+let filter='All'; const open=new Set(); const seenOrders=new Set(); let customers=[]; let orders=[];
+function fmtMoney(o){const c=o.currency||'USD';const n=Number(o.total||0);const sym=c==='USD'?'$':c+' ';return sym+n.toFixed(2);}
+function rel(){return '—';}
+function colorFor(name){let h=0;for(let i=0;i<(name||'').length;i++)h=(h*31+name.charCodeAt(i))>>>0;const hue=h%360;return `hsl(${hue},65%,45%)`;}
 async function load(){
   const [health,custs,ords,msgs]=await Promise.all([fetch('/health').then(r=>r.json()).catch(()=>({})),fetch('/customers').then(r=>r.json()),fetch('/orders').then(r=>r.json()),fetch('/messages').then(r=>r.json())]);
+  customers=custs; orders=ords;
   document.getElementById('conn').textContent='Connected to: '+(health.status?'Mock store':'Unknown');
   document.getElementById('sCust').textContent=custs.length;
   document.getElementById('sOrd').textContent=ords.length;
   document.getElementById('sMsg').textContent=msgs.filter(m=>m.status==='sent').length;
   const llm=msgs.filter(m=>m.source==='llm').length; document.getElementById('sLlm').textContent=(msgs.length?Math.round(100*llm/msgs.length):0)+'%';
-  const chipDefs=['All','Pending','Processing','Shipped','Completed']; const chips=document.getElementById('chips'); chips.innerHTML=''; chipDefs.forEach(c=>{const b=document.createElement('button');b.className='chip'+(c===filter?' active':'');b.textContent=c;b.onclick=()=>{filter=c;renderOrders(ords);loadChips();};chips.appendChild(b);});
-  renderOrders(ords); renderCust(custs); renderMsgs(msgs);
+  const chips=document.getElementById('chips');chips.innerHTML='';
+  const counts={'All':ords.length};
+  ['Pending','Processing','Shipped','Completed'].forEach(s=>counts[s]=ords.filter(o=>(o.status||'').toLowerCase()===s.toLowerCase()).length);
+  ['All','Pending','Processing','Shipped','Completed'].forEach(c=>{const b=document.createElement('button');b.className='chip'+(c===filter?' active':'');b.innerHTML=esc(c)+`<span class="cnt">${counts[c]}</span>`;b.onclick=()=>{filter=c;renderOrders();};chips.appendChild(b);});
+  renderOrders(); renderCust(custs); renderMsgs(msgs);
 }
-function loadChips(){}
-function renderOrders(ords){
-  const f=filter==='All'?ords:ords.filter(o=>(o.status||'').toLowerCase()===filter.toLowerCase());
+function customerFor(id){return customers.find(c=>c.woo_id===id);}
+function custOrders(id,email){return orders.filter(o=>o.customer_woo_id===id).length;}
+function renderOrders(){
+  const f=filter==='All'?orders:orders.filter(o=>(o.status||'').toLowerCase()===filter.toLowerCase());
   const sorted=[...f].sort((a,b)=>b.woo_id-a.woo_id);
   const tb=document.getElementById('orders');tb.innerHTML='';
-  sorted.forEach(o=>{const tr=document.createElement('tr'); if(!seenOrders.has(o.woo_id)){seenOrders.add(o.woo_id);tr.classList.add('new');} const st=(o.status||'').toLowerCase();
-    [o.woo_id, null, o.total, o.currency].forEach((v,i)=>{const td=document.createElement('td'); if(i===1){const span=document.createElement('span');span.className='badge '+st;span.textContent=o.status;td.appendChild(span);}else td.textContent=v;tr.appendChild(td);});tb.appendChild(tr);});
+  sorted.forEach(o=>{const tr=document.createElement('tr'); if(!seenOrders.has(o.woo_id)){seenOrders.add(o.woo_id);tr.classList.add('new');}
+    const cust=customerFor(o.customer_woo_id);
+    const name=cust?cust.name:'Unknown';const email=cust?cust.email:'';
+    const st=(o.status||'').toLowerCase();
+    const dotColor={pending:'#f59e0b',processing:'#3b82f6',shipped:'#4f46e5',completed:'#22c55e',cancelled:'#ef4444'}[st]||'#94a3b8';
+    function mk(html){const td=document.createElement('td');td.innerHTML=html;return td;} // only trusted, escaped values used
+    const c1=document.createElement('td');c1.textContent=o.woo_id;tr.appendChild(c1);
+    const c2=document.createElement('td');c2.innerHTML=`${esc(name)}<br><small style="color:var(--muted)">${esc(email)}</small>`;tr.appendChild(c2);
+    const c3=document.createElement('td');c3.innerHTML=`<span class="badge ${st}"><span class="dotb" style="background:${dotColor}"></span>${esc(o.status)}</span>`;tr.appendChild(c3);
+    const c4=document.createElement('td');c4.style.textAlign='right';c4.textContent=fmtMoney(o);tr.appendChild(c4);
+    const c5=document.createElement('td');c5.textContent=rel();tr.appendChild(c5);
+    tb.appendChild(tr);});
   document.getElementById('oEmpty').style.display=sorted.length?'none':'block';
 }
-function initials(n){return (n||'').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';}
 function renderCust(custs){const el=document.getElementById('customers');el.innerHTML='';if(!custs.length){document.getElementById('cEmpty').style.display='block';return;}document.getElementById('cEmpty').style.display='none';
   custs.forEach(c=>{const d=document.createElement('div');d.className='cust';
-    const av=document.createElement('div');av.className='avatar';av.textContent=initials(c.name);d.appendChild(av);
-    const info=document.createElement('div');info.innerHTML=`<strong>${esc(c.name||'Unnamed')}</strong><br><small>${esc(c.email||'')}</small><br><small>${esc(c.orders_count||0)} orders</small>`;d.appendChild(info);el.appendChild(d);});}
+    const av=document.createElement('div');av.className='avatar';av.style.background=colorFor(c.name);av.textContent=initials(c.name);d.appendChild(av);
+    const info=document.createElement('div');info.style.flex='1';
+    info.innerHTML=`<strong>${esc(c.name||'Unnamed')}</strong><br><small style="color:var(--muted)">${esc(c.email||'')}</small>`;
+    d.appendChild(info);
+    const right=document.createElement('div');right.style.textAlign='right';
+    right.innerHTML=`<span class="pill2">${custOrders(c.woo_id,c.email)} orders</span><br><small style="color:var(--muted)">$${Number(c.total_spent||0).toFixed(2)}</small>`;
+    d.appendChild(right);el.appendChild(d);});}
+function initials(n){return (n||'').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase()||'?';}
 function renderMsgs(msgs){const el=document.getElementById('messages');el.innerHTML='';if(!msgs.length){document.getElementById('mEmpty').style.display='block';return;}document.getElementById('mEmpty').style.display='none';
-  msgs.slice().reverse().forEach(m=>{const card=document.createElement('div');card.className='msg';
+  msgs.slice().reverse().forEach(m=>{const card=document.createElement('div');card.className='msg '+(m.source==='llm'?'llm':'');
     const head=document.createElement('div');head.className='msghead';
-    const left=document.createElement('div');left.innerHTML=`<strong>${esc(m.to_email)}</strong><br>${esc(m.subject)}`;head.appendChild(left);
-    const right=document.createElement('div'); 
+    const left=document.createElement('div');left.innerHTML=`<strong>${esc(m.to_email)}</strong><br><span style="color:var(--muted)">${esc(m.subject)}</span>`;head.appendChild(left);
+    const right=document.createElement('div');
     const sb=document.createElement('span');sb.className='badge '+(m.status==='sent'?'completed':'pending');sb.textContent=m.status;right.appendChild(sb);
     const src=document.createElement('span');src.className='badge '+(m.source==='llm'?'source-llm':'source-rule');src.textContent=m.source==='llm'?'LLM':'Rule-based';src.style.marginLeft='6px';right.appendChild(src);
-    const tgl=document.createElement('button');tgl.textContent='Agent reasoning';tgl.style.marginLeft='6px';tgl.onclick=()=>{const r=card.querySelector('.reason');if(open.has(m.id)){r.classList.remove('open');open.delete(m.id);}else{r.classList.add('open');open.add(m.id);}};right.appendChild(tgl);
+    const tgl=document.createElement('button');tgl.className='btn';tgl.style.marginLeft='6px';tgl.style.padding='4px 8px';tgl.style.fontSize='11px';tgl.style.background='transparent';tgl.style.color='var(--accent)';tgl.style.border='1px solid var(--accent)';tgl.textContent='Agent reasoning';tgl.onclick=()=>{const r=card.querySelector('.reason');if(open.has(m.id)){r.classList.remove('open');open.delete(m.id);}else{r.classList.add('open');open.add(m.id);}};right.appendChild(tgl);
     head.appendChild(right);card.appendChild(head);
+    const prev=document.createElement('div');prev.className='preview';prev.textContent=m.body||'';card.appendChild(prev);
     const reason=document.createElement('div');reason.className='reason'+(open.has(m.id)?' open':'');
-    try{const tr=JSON.parse(m.trace||'[]');reason.textContent=tr.map(x=>JSON.stringify(x,null,2)).join('\n---\n')||m.trace;}catch(e){reason.textContent=m.trace||'';}
-    card.appendChild(reason);el.appendChild(card);});}
-async function simulate(){const r=await fetch('/dev/simulate',{method:'POST'});if(r.ok){showToast('Order simulated, agent is writing a message...');await load();}else showToast('Simulate unavailable');}
+    const copy=document.createElement('button');copy.className='copy';copy.textContent='Copy';copy.onclick=()=>navigator.clipboard.writeText(reason.textContent);reason.appendChild(copy);
+    const pre=document.createElement('pre');pre.style.margin='0';pre.textContent=m.trace||'[]';try{const tr=JSON.parse(m.trace||'[]');pre.textContent=tr.map(x=>JSON.stringify(x,null,2)).join('\n---\n');}catch(e){}
+    reason.appendChild(pre);card.appendChild(reason);el.appendChild(card);});}
+async function simulate(){
+  const btn=document.getElementById('simBtn');btn.disabled=true;const old=btn.innerHTML;btn.innerHTML='Simulating <span class="spinner"></span>';
+  const r=await fetch('/dev/simulate',{method:'POST'});
+  btn.disabled=false;btn.innerHTML=old;
+  if(r.ok){showToast('Order simulated, agent is writing a message...');await load();}else showToast('Simulate unavailable');
+}
 function showToast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';setTimeout(()=>el.style.display='none',2500);}
-async function detectSim(){try{const r=await fetch('/dev/simulate',{method:'POST'});if(r.status!==404){document.getElementById('simBtn').style.display='inline-block';document.getElementById('simBtn').onclick=simulate;}}catch(e){}} 
+async function detectSim(){try{const r=await fetch('/dev/simulate',{method:'POST'});if(r.status!==404){document.getElementById('simBtn').style.display='inline-block';document.getElementById('simBtn').onclick=simulate;}}catch(e){}}
 detectSim(); load(); setInterval(load,5000);
 </script></body></html>
