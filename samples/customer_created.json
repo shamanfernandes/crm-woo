@@ -1,0 +1,1 @@
+{"id": 42, "email": "jane@example.com", "billing": {"email": "jane@example.com", "first_name": "Jane", "last_name": "Doe"}, "orders_count": 1, "total_spent": "50.0"}
