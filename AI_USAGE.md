@@ -1,4 +1,3 @@
 # AI Usage
-Step 1: skeleton. Prompt generated tree/files. Verified pytest import.
-
-## Part A/B: coverage 85.9%, tool-using agent with fallback. Verified pytest 12 passed.
+Phase1/2 use LLM: Groq openai/gpt-oss-120b free tool calling.
+Entries: generated scaffolding/tests/agent/dashboard; rejected hardcoded secrets; verified pytest.

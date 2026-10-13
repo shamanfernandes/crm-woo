@@ -16,7 +16,7 @@ def setup():
 def test_rule_fallback():
     db,o=setup()
     try:
-        agent=CRMAgent(db)
+        agent=CRMAgent(db, llm=__import__("app.agents.llm_client",fromlist=["LLMClient"]).LLMClient(api_key="",base_url="https://x",model="m"))
         m=agent.handle_order_event(o, CustomerRepo(db).get(42), None)
         assert m is not None and m.source=="rule-based"
     finally:
