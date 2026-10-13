@@ -16,7 +16,9 @@ def startup():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    import os
+    real = bool(os.getenv("WC_BASE_URL") and os.getenv("WC_CONSUMER_KEY") and os.getenv("WC_CONSUMER_SECRET"))
+    return {"status":"ok","adapter": ("realwoo" if real else "mock")}
 
 @app.post("/webhook/woocommerce")
 async def webhook(request: Request, db: Session = Depends(get_session)):

@@ -72,7 +72,7 @@ function colorFor(name){let h=0;for(let i=0;i<(name||'').length;i++)h=(h*31+name
 async function load(){
   const [health,custs,ords,msgs]=await Promise.all([fetch('/health').then(r=>r.json()).catch(()=>({})),fetch('/customers').then(r=>r.json()),fetch('/orders').then(r=>r.json()),fetch('/messages').then(r=>r.json())]);
   customers=custs; orders=ords;
-  document.getElementById('conn').textContent='Connected to: '+(health.status?'Mock store':'Unknown');
+  document.getElementById('conn').textContent='Connected to: '+(health.adapter==="realwoo"||health.adapter==="woo"?"Live store":"Mock store");
   document.getElementById('sCust').textContent=custs.length;
   document.getElementById('sOrd').textContent=ords.length;
   document.getElementById('sMsg').textContent=msgs.filter(m=>m.status==='sent').length;
